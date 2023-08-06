@@ -63,9 +63,8 @@ fn display_board(board: &[[Option<Player>; 3]; 3]) {
     for i in board {
         println!(
             "              
-                       {}           #       {}          #      {}        
-                                   #                    #               
-                -------------------------------------------------------
+                   {} | {} | {}
+               -----------------
             ",
             i[0].unwrap_or(Player::None),
             i[1].unwrap_or(Player::None),
@@ -271,17 +270,82 @@ fn main() {
             board = new_board;
             if check_winner(&board).is_some() {
                 display_board(&board);
-                panic!("THERE IS A WINNER");
+                match check_winner(&board) {
+                    Some(Player::O) => {
+                        println!("Sorry you have lost :(");
+                        break;
+                    }
+                    Some(Player::X) => {
+                        println!("Congratulations you have won the game!");
+                        break;
+                    }
+                    Some(Player::None) => continue,
+                    None => continue,
+                }
+            }
+            if check_draw(&board) {
+                println!("The game is a draw");
+                break;
             }
             let best_move = min_max(&board).unwrap();
             board = result(&board, best_move);
+            if check_winner(&board).is_some() {
+                display_board(&board);
+                match check_winner(&board) {
+                    Some(Player::O) => {
+                        println!("Sorry you have lost :(");
+                        break;
+                    }
+                    Some(Player::X) => {
+                        println!("Congratulations you have won the game!");
+                        break;
+                    }
+                    Some(Player::None) => continue,
+                    None => continue,
+                }
+            }
         } else {
             let best_move = min_max(&board).unwrap();
             board = result(&board, best_move);
             display_board(&board);
+            if check_winner(&board).is_some() {
+                display_board(&board);
+                match check_winner(&board) {
+                    Some(Player::O) => {
+                        println!("Congratulations you have won!");
+                        break;
+                    }
+                    Some(Player::X) => {
+                        println!("Sorry you have lost, try again :(");
+                        break;
+                    }
+                    Some(Player::None) => continue,
+                    None => continue,
+                }
+            }
+            if check_draw(&board) {
+                println!("The game is a draw");
+                break;
+            }
             let (row, pos) = read_input();
             let new_board = result(&board, (row, pos));
-            board = new_board
+            board = new_board;
+            if check_winner(&board).is_some() {
+                display_board(&board);
+                match check_winner(&board) {
+                    Some(Player::O) => {
+                        println!("Congratulations you have won!");
+                        break;
+                    }
+                    Some(Player::X) => {
+                        println!("Sorry you have lost, try again :(");
+                        break;
+                    }
+                    Some(Player::None) => continue,
+                    None => continue,
+                }
+            }
         }
     }
+    println!("Thank you for playing the game. Source code at: https://github.com/DhanushAdithiya/ai-tic_tac_toe-rust")
 }
